@@ -2,7 +2,7 @@
 
 **Estudante:** Patrícia Helen Ribeiro Moreira  
 **Instituição:** Universidade Federal dos Vales do Jequitinhonha e Mucuri (UFVJM)  
-**Curso:** Sistemas de Informação (12º Período)  
+**Curso:** Sistemas de Informação   
 
 Repositório oficial contendo a implementação prática de redes de computadores, englobando sockets de baixo nível (TCP/UDP), controle de concorrência com threads, análise de tráfego com Wireshark e comunicação em tempo real via WebSockets.
 
