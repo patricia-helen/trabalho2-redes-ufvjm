@@ -1,0 +1,92 @@
+<!-- 
+Trabalho 2 de Redes de Computadores 2 - Exercício 10
+Integrantes: Patrícia Helen Ribeiro Moreira
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat WebSockets - Trabalho de Redes</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        #chatbox { height: 350px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; border-radius: 4px; background: #fafafa; }
+        .msg-sistema { color: #888; font-style: italic; font-size: 0.9em; text-align: center; margin: 5px 0; }
+        .msg-chat { margin-bottom: 8px; line-height: 1.4; }
+        .username { font-weight: bold; color: #2980b9; }
+        input[type="text"] { width: calc(100% - 100px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; background: #2ecc71; color: white; cursor: pointer; font-weight: bold; }
+        button.sair { background: #e74c3c; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🌐 Chat em Tempo Real</h2>
+        
+        <!-- Tela de Login -->
+        <div id="login-area">
+            <input type="text" id="username" placeholder="Digite seu nome para entrar..." onkeypress="if(event.key === 'Enter') conectar()">
+            <button onclick="conectar()">Entrar</button>
+        </div>
+
+        <!-- Tela do Chat (Inicia Oculta) -->
+        <div id="chat-area" style="display:none;">
+            <div id="chatbox"></div>
+            <div>
+                <input type="text" id="mensagem" placeholder="Digite sua mensagem..." onkeypress="if(event.key === 'Enter') enviar()">
+                <button onclick="enviar()">Enviar</button>
+            </div>
+            <button class="sair" onclick="desconectar()">Sair do Chat</button>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+
+        function conectar() {
+            const user = document.getElementById("username").value.trim();
+            if (!user) return alert("Por favor, digite um nome!");
+
+            // REQUISITO: WebSocket API nativa do navegador
+            ws = new WebSocket("ws://127.0.0.1:8765");
+
+            ws.onopen = () => {
+                document.getElementById("login-area").style.display = "none";
+                document.getElementById("chat-area").style.display = "block";
+                // Envia pacote JSON de login
+                ws.send(JSON.stringify({ tipo: "login", username: user }));
+            };
+
+            ws.onmessage = (event) => {
+                const dados = JSON.parse(event.data);
+                const chatbox = document.getElementById("chatbox");
+                
+                if (dados.tipo === "sistema") {
+                    chatbox.innerHTML += `<div class="msg-sistema">${dados.mensagem}</div>`;
+                } else if (dados.tipo === "chat") {
+                    chatbox.innerHTML += `<div class="msg-chat"><span class="username">${dados.username}:</span> ${dados.mensagem}</div>`;
+                }
+                chatbox.scrollTop = chatbox.scrollHeight; // Rola para o fim automaticamente
+            };
+
+            ws.onclose = () => {
+                document.getElementById("login-area").style.display = "block";
+                document.getElementById("chat-area").style.display = "none";
+                document.getElementById("chatbox").innerHTML = "";
+            };
+        }
+
+        function enviar() {
+            const input = document.getElementById("mensagem");
+            if (input.value.trim() !== "" && ws) {
+                ws.send(JSON.stringify({ tipo: "mensagem", mensagem: input.value.trim() }));
+                input.value = "";
+            }
+        }
+
+        function desconectar() {
+            if (ws) ws.close(); // Isso dispara o bloco 'finally' lá no Python
+        }
+    </script>
+</body>
+</html>
