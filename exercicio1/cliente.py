@@ -2,8 +2,6 @@
 Trabalho 2 de Redes de Computadores 2 - Exercício 1
 Integrantes: 
 - Patrícia Helen Ribeiro Moreira
-- [Nome 2]
-- [Nome 3]
 """
 import argparse
 import socket
